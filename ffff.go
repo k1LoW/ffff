@@ -34,7 +34,7 @@ func FuzzyFind(keyword string, to *truetype.Options, oo *opentype.FaceOptions) (
 	for _, dir := range fontdir.Get() {
 		err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
-				return err
+				return nil
 			}
 			if info.IsDir() {
 				return nil
