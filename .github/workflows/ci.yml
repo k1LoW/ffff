@@ -18,6 +18,9 @@ jobs:
       - name: Install codecov
         run: sudo pip install codecov
 
+      - name: List fonts
+        run: sudo apt -y install fontconfig && fc-list
+
       - name: Check out source code
         uses: actions/checkout@v2
 
