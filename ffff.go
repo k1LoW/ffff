@@ -20,91 +20,30 @@ type Font struct {
 	face font.Face
 }
 
+var (
+	names = []string{}
+	paths = []string{}
+	fonts = map[string]Font{}
+)
+
 // FuzzyFind find font by keyword
 func FuzzyFind(keyword string, to *truetype.Options, oo *opentype.FaceOptions) (Font, error) {
 	list := []string{}
-	names := []string{}
-	paths := []string{}
-	fonts := map[string]Font{}
 	pathOnly := false
 	lk := strings.ToLower(keyword)
 	if strings.HasSuffix(lk, ".ttf") || strings.HasSuffix(lk, ".ttc") || strings.HasSuffix(lk, ".otf") {
 		pathOnly = true
 	}
-	for _, dir := range fontdir.Get() {
-		err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return nil
-			}
-			if info.IsDir() {
-				return nil
-			}
-			lp := strings.ToLower(path)
-			abs, err := filepath.Abs(path)
-			if err != nil {
-				return err
-			}
-			var face font.Face
-			if strings.HasSuffix(lp, ".ttf") || strings.HasSuffix(lp, ".ttc") {
-				// TrueType
-				d, err := ioutil.ReadFile(filepath.Clean(path))
-				if err != nil {
-					return err
-				}
-				f, err := truetype.Parse(d)
-				if err != nil {
-					return nil
-				}
-				name := f.Name(4)
-				names = append(names, name)
-				face = truetype.NewFace(f, to)
-				if !pathOnly {
-					fonts[name] = Font{
-						path: abs,
-						face: face,
-					}
-				}
-			} else if strings.HasSuffix(lp, ".otf") {
-				// OpenType
-				d, err := ioutil.ReadFile(filepath.Clean(path))
-				if err != nil {
-					return err
-				}
-				f, err := sfnt.Parse(d)
-				if err != nil {
-					return nil
-				}
-				name, err := f.Name(nil, 4)
-				if err != nil {
-					return nil
-				}
-				names = append(names, name)
-				face, err = opentype.NewFace(f, oo)
-				if err != nil {
-					return nil
-				}
-				if !pathOnly {
-					fonts[name] = Font{
-						path: abs,
-						face: face,
-					}
-				}
-			} else {
-				return nil
-			}
-			paths = append(paths, abs)
-			fonts[abs] = Font{
-				path: abs,
-				face: face,
-			}
-			return nil
-		})
-		if err != nil {
+
+	if len(fonts) == 0 {
+		if err := listFonts(to, oo); err != nil {
 			return Font{}, err
 		}
 	}
 
-	list = append(list, names...)
+	if !pathOnly {
+		list = append(list, names...)
+	}
 	list = append(list, paths...)
 
 	matches := fuzzy.Find(keyword, list)
@@ -134,4 +73,76 @@ func FuzzyFindFace(keyword string, to *truetype.Options, oo *opentype.FaceOption
 		return &opentype.Face{}, err
 	}
 	return f.face, nil
+}
+
+func listFonts(to *truetype.Options, oo *opentype.FaceOptions) error {
+	for _, dir := range fontdir.Get() {
+		err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return nil
+			}
+			if info.IsDir() {
+				return nil
+			}
+			lp := strings.ToLower(path)
+			abs, err := filepath.Abs(path)
+			if err != nil {
+				return err
+			}
+			var face font.Face
+			if strings.HasSuffix(lp, ".ttf") || strings.HasSuffix(lp, ".ttc") {
+				// TrueType
+				d, err := ioutil.ReadFile(filepath.Clean(path))
+				if err != nil {
+					return err
+				}
+				f, err := truetype.Parse(d)
+				if err != nil {
+					return nil
+				}
+				name := f.Name(4)
+				names = append(names, name)
+				face = truetype.NewFace(f, to)
+				fonts[name] = Font{
+					path: abs,
+					face: face,
+				}
+			} else if strings.HasSuffix(lp, ".otf") {
+				// OpenType
+				d, err := ioutil.ReadFile(filepath.Clean(path))
+				if err != nil {
+					return err
+				}
+				f, err := sfnt.Parse(d)
+				if err != nil {
+					return nil
+				}
+				name, err := f.Name(nil, 4)
+				if err != nil {
+					return nil
+				}
+				names = append(names, name)
+				face, err = opentype.NewFace(f, oo)
+				if err != nil {
+					return nil
+				}
+				fonts[name] = Font{
+					path: abs,
+					face: face,
+				}
+			} else {
+				return nil
+			}
+			paths = append(paths, abs)
+			fonts[abs] = Font{
+				path: abs,
+				face: face,
+			}
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
