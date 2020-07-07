@@ -1,13 +1,20 @@
 package ffff
 
 import (
+	"os"
 	"strings"
 	"testing"
 )
 
 func TestFuzzyFindPath(t *testing.T) {
-	path, _ := FuzzyFindPath("Ari")
-	if !strings.Contains(strings.ToLower(path), "arial") {
-		t.Error("could not find font 'arial'")
+	path, err := FuzzyFindPath("gothi")
+	if err != nil {
+		t.Error(err)
+	}
+	if !strings.Contains(strings.ToLower(path), "gothic") {
+		t.Error("could not find font 'gothic'")
+	}
+	if _, err := os.Stat(path); err != nil {
+		t.Error(err)
 	}
 }
