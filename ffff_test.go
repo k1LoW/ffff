@@ -7,12 +7,12 @@ import (
 )
 
 func TestFuzzyFindPath(t *testing.T) {
-	path, err := FuzzyFindPath("gothi")
+	path, err := FuzzyFindPath("mon")
 	if err != nil {
 		t.Error(err)
 	}
-	if !strings.Contains(strings.ToLower(path), "gothic") {
-		t.Error("could not find font 'gothic'")
+	if !strings.Contains(strings.ToLower(path), "mono") {
+		t.Error("could not find font 'mono'")
 	}
 	if _, err := os.Stat(path); err != nil {
 		t.Error(err)
