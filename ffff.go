@@ -28,7 +28,7 @@ func FuzzyFind(keyword string, to *truetype.Options, oo *opentype.FaceOptions) (
 	fonts := map[string]Font{}
 	pathOnly := false
 	lk := strings.ToLower(keyword)
-	if strings.HasSuffix(lk, ".ttf") || strings.HasSuffix(lk, ".otf") {
+	if strings.HasSuffix(lk, ".ttf") || strings.HasSuffix(lk, ".ttc") || strings.HasSuffix(lk, ".otf") {
 		pathOnly = true
 	}
 	for _, dir := range fontdir.Get() {
@@ -45,7 +45,7 @@ func FuzzyFind(keyword string, to *truetype.Options, oo *opentype.FaceOptions) (
 				return err
 			}
 			var face font.Face
-			if strings.HasSuffix(lp, ".ttf") {
+			if strings.HasSuffix(lp, ".ttf") || strings.HasSuffix(lp, ".ttc") {
 				// TrueType
 				d, err := ioutil.ReadFile(filepath.Clean(path))
 				if err != nil {
