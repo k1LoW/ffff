@@ -20,12 +20,17 @@ type Font struct {
 	face font.Face
 }
 
-// FuzzyFind ...
+// FuzzyFind find font by keyword
 func FuzzyFind(keyword string, to *truetype.Options, oo *opentype.FaceOptions) (Font, error) {
 	list := []string{}
 	names := []string{}
 	paths := []string{}
 	fonts := map[string]Font{}
+	pathOnly := false
+	lk := strings.ToLower(keyword)
+	if strings.HasSuffix(lk, ".ttf") || strings.HasSuffix(lk, ".otf") {
+		pathOnly = true
+	}
 	for _, dir := range fontdir.Get() {
 		err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 			if err != nil {
@@ -53,9 +58,11 @@ func FuzzyFind(keyword string, to *truetype.Options, oo *opentype.FaceOptions) (
 				name := f.Name(4)
 				names = append(names, name)
 				face = truetype.NewFace(f, to)
-				fonts[name] = Font{
-					path: abs,
-					face: face,
+				if !pathOnly {
+					fonts[name] = Font{
+						path: abs,
+						face: face,
+					}
 				}
 			} else if strings.HasSuffix(lp, ".otf") {
 				// OpenType
@@ -76,9 +83,11 @@ func FuzzyFind(keyword string, to *truetype.Options, oo *opentype.FaceOptions) (
 				if err != nil {
 					return nil
 				}
-				fonts[name] = Font{
-					path: abs,
-					face: face,
+				if !pathOnly {
+					fonts[name] = Font{
+						path: abs,
+						face: face,
+					}
 				}
 			} else {
 				return nil
@@ -109,7 +118,7 @@ func FuzzyFind(keyword string, to *truetype.Options, oo *opentype.FaceOptions) (
 	return m, nil
 }
 
-// FuzzyFindPath find font file path by font name or file name
+// FuzzyFindPath find font file path by keyword
 func FuzzyFindPath(keyword string) (string, error) {
 	f, err := FuzzyFind(keyword, nil, nil)
 	if err != nil {
@@ -118,7 +127,7 @@ func FuzzyFindPath(keyword string) (string, error) {
 	return f.path, nil
 }
 
-// FuzzyFindFace find font.Face by font name or file name
+// FuzzyFindFace find font.Face by keyword
 func FuzzyFindFace(keyword string, to *truetype.Options, oo *opentype.FaceOptions) (font.Face, error) {
 	f, err := FuzzyFind(keyword, nil, nil)
 	if err != nil {
