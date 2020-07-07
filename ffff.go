@@ -47,7 +47,7 @@ func FuzzyFind(keyword string, to *truetype.Options, oo *opentype.FaceOptions) (
 			var face font.Face
 			if strings.HasSuffix(lp, ".ttf") {
 				// TrueType
-				d, err := ioutil.ReadFile(path)
+				d, err := ioutil.ReadFile(filepath.Clean(path))
 				if err != nil {
 					return err
 				}
@@ -66,7 +66,7 @@ func FuzzyFind(keyword string, to *truetype.Options, oo *opentype.FaceOptions) (
 				}
 			} else if strings.HasSuffix(lp, ".otf") {
 				// OpenType
-				d, err := ioutil.ReadFile(path)
+				d, err := ioutil.ReadFile(filepath.Clean(path))
 				if err != nil {
 					return err
 				}
