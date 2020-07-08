@@ -13,6 +13,7 @@ import (
 	"golang.org/x/image/font"
 	"golang.org/x/image/font/opentype"
 	"golang.org/x/image/font/sfnt"
+	"golang.org/x/text/unicode/norm"
 )
 
 type Font struct {
@@ -133,8 +134,9 @@ func listFonts(to *truetype.Options, oo *opentype.FaceOptions) error {
 			} else {
 				return nil
 			}
-			paths = append(paths, abs)
-			fonts[abs] = Font{
+			filename := norm.NFKC.String(filepath.Base(abs))
+			paths = append(paths, filename)
+			fonts[filename] = Font{
 				path: abs,
 				face: face,
 			}
