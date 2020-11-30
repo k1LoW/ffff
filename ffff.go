@@ -69,9 +69,9 @@ func FuzzyFindPath(keyword string) (string, error) {
 
 // FuzzyFindFace find font.Face by keyword
 func FuzzyFindFace(keyword string, to *truetype.Options, oo *opentype.FaceOptions) (font.Face, error) {
-	f, err := FuzzyFind(keyword, nil, nil)
+	f, err := FuzzyFind(keyword, to, oo)
 	if err != nil {
-		return &opentype.Face{}, err
+		return nil, err
 	}
 	return f.face, nil
 }
