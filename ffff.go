@@ -17,8 +17,8 @@ import (
 )
 
 type Font struct {
-	path string
-	face font.Face
+	Path string
+	Face font.Face
 }
 
 var (
@@ -64,7 +64,7 @@ func FuzzyFindPath(keyword string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return f.path, nil
+	return f.Path, nil
 }
 
 // FuzzyFindFace find font.Face by keyword
@@ -73,7 +73,7 @@ func FuzzyFindFace(keyword string, to *truetype.Options, oo *opentype.FaceOption
 	if err != nil {
 		return nil, err
 	}
-	return f.face, nil
+	return f.Face, nil
 }
 
 func listFonts(to *truetype.Options, oo *opentype.FaceOptions) error {
@@ -105,8 +105,8 @@ func listFonts(to *truetype.Options, oo *opentype.FaceOptions) error {
 				names = append(names, name)
 				face = truetype.NewFace(f, to)
 				fonts[name] = Font{
-					path: abs,
-					face: face,
+					Path: abs,
+					Face: face,
 				}
 			} else if strings.HasSuffix(lp, ".otf") {
 				// OpenType
@@ -128,8 +128,8 @@ func listFonts(to *truetype.Options, oo *opentype.FaceOptions) error {
 					return nil
 				}
 				fonts[name] = Font{
-					path: abs,
-					face: face,
+					Path: abs,
+					Face: face,
 				}
 			} else {
 				return nil
@@ -137,8 +137,8 @@ func listFonts(to *truetype.Options, oo *opentype.FaceOptions) error {
 			filename := norm.NFKC.String(filepath.Base(abs))
 			paths = append(paths, filename)
 			fonts[filename] = Font{
-				path: abs,
-				face: face,
+				Path: abs,
+				Face: face,
 			}
 			return nil
 		})
