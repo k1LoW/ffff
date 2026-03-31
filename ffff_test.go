@@ -7,7 +7,7 @@ import (
 )
 
 func TestFuzzyFindPath(t *testing.T) {
-	path, err := FuzzyFindPath("mon")
+	path, err := FuzzyFindPath("mono")
 	if err != nil {
 		t.Error(err)
 	}
